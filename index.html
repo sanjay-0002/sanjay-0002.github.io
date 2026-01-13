@@ -3,82 +3,81 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>L Voice Player</title>
-
-<!-- Google Font for premium feel -->
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<title>L Voice Player - Typing Captions</title>
 
 <style>
-  /* Reset & base styles */
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
+@font-face {
+  font-family: 'CustomText';
+  src: url('text.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 
-  body {
-    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-    color: #fff;
-    font-family: 'Inter', sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    flex-direction: column;
-    overflow: hidden;
-  }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'CustomText', sans-serif;
+}
 
-  h1 {
-    font-size: 2.5rem;
-    margin-bottom: 20px;
-    text-align: center;
-    letter-spacing: 2px;
-    text-shadow: 0 0 10px rgba(0,0,0,0.5);
-  }
+body {
+  background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  padding: 20px;
+}
 
-  audio {
-    width: 100%;
-    max-width: 600px;
-    outline: none;
-    border-radius: 12px;
-    margin-bottom: 30px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-  }
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  text-align: center;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(0,0,0,0.5);
+}
 
-  .captions {
-    background: rgba(0,0,0,0.5);
-    padding: 15px 20px;
-    border-radius: 12px;
-    max-width: 700px;
-    text-align: center;
-    font-size: 1.25rem;
-    min-height: 60px;
-    line-height: 1.5;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-    transition: all 0.3s ease;
-  }
+audio {
+  width: 100%;
+  max-width: 600px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  outline: none;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+}
 
-  .captions span {
-    display: block;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
+.captions {
+  background: rgba(0,0,0,0.5);
+  padding: 15px 20px;
+  border-radius: 12px;
+  max-width: 700px;
+  text-align: center;
+  font-size: 1.25rem;
+  min-height: 60px;
+  line-height: 1.5;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+  overflow-wrap: break-word;
+}
 
-  .captions span.active {
-    opacity: 1;
-    color: #ffd700;
-  }
+/* Typing cursor effect */
+.captions::after {
+  content: '|';
+  animation: blink 1s infinite;
+  margin-left: 2px;
+}
 
-  /* Responsive */
-  @media (max-width: 768px) {
-    h1 {
-      font-size: 2rem;
-    }
-    .captions {
-      font-size: 1rem;
-      padding: 10px 15px;
-    }
-  }
+@keyframes blink {
+  0%, 50%, 100% { opacity: 1; }
+  25%, 75% { opacity: 0; }
+}
+
+@media(max-width:768px){
+  h1 { font-size:2rem; }
+  .captions { font-size:1rem; padding:10px 15px; }
+}
 </style>
 </head>
 <body>
@@ -93,51 +92,66 @@
 <div class="captions" id="captions">Captions will appear here...</div>
 
 <script>
-  const audio = document.getElementById('audio');
-  const captionsDiv = document.getElementById('captions');
+const audio = document.getElementById('audio');
+const captionsDiv = document.getElementById('captions');
 
-  // Load captions from VTT
-  let captions = [];
+let captions = [];
 
-  fetch('l-voice.vtt')
-    .then(response => response.text())
-    .then(data => {
-      // Parse VTT file
-      const lines = data.split(/\r?\n/);
-      for (let i = 0; i < lines.length; i++) {
-        if (lines[i].includes('-->')) {
-          const times = lines[i].split(' --> ');
-          const start = parseTime(times[0].trim());
-          const end = parseTime(times[1].trim());
-          const text = lines[i+1] || '';
-          captions.push({start, end, text});
-          i++; // skip text line
-        }
+// Load VTT file
+fetch('l-voice.vtt')
+  .then(res => res.text())
+  .then(data => {
+    const lines = data.split(/\r?\n/);
+    for(let i=0;i<lines.length;i++){
+      if(lines[i].includes('-->')){
+        const times = lines[i].split(' --> ');
+        const start = parseTime(times[0].trim());
+        const end = parseTime(times[1].trim());
+        const text = lines[i+1] || '';
+        captions.push({start, end, text});
+        i++;
       }
-    });
-
-  function parseTime(timeString) {
-    const parts = timeString.split(':');
-    let seconds = 0;
-    if (parts.length === 3) {
-      seconds = parseFloat(parts[0])*3600 + parseFloat(parts[1])*60 + parseFloat(parts[2].replace(',', '.'));
-    } else if (parts.length === 2) {
-      seconds = parseFloat(parts[0])*60 + parseFloat(parts[1].replace(',', '.'));
     }
-    return seconds;
-  }
-
-  // Update captions as audio plays
-  audio.addEventListener('timeupdate', () => {
-    const currentTime = audio.currentTime;
-    let activeText = '';
-    captions.forEach(c => {
-      if (currentTime >= c.start && currentTime <= c.end) {
-        activeText = c.text;
-      }
-    });
-    captionsDiv.innerHTML = activeText ? `<span class="active">${activeText}</span>` : '';
   });
+
+function parseTime(timeString){
+  const parts = timeString.split(':');
+  let seconds = 0;
+  if(parts.length===3){
+    seconds = parseFloat(parts[0])*3600 + parseFloat(parts[1])*60 + parseFloat(parts[2].replace(',', '.'));
+  } else if(parts.length===2){
+    seconds = parseFloat(parts[0])*60 + parseFloat(parts[1].replace(',', '.'));
+  }
+  return seconds;
+}
+
+let typingTimeout;
+
+audio.addEventListener('timeupdate', ()=>{
+  const currentTime = audio.currentTime;
+  let activeCaption = '';
+  captions.forEach(c=>{
+    if(currentTime >= c.start && currentTime <= c.end){
+      activeCaption = c.text;
+    }
+  });
+
+  // If caption changed, animate typing
+  if(captionsDiv.dataset.current !== activeCaption){
+    captionsDiv.dataset.current = activeCaption;
+    captionsDiv.innerHTML = '';
+    let i = 0;
+    clearTimeout(typingTimeout);
+    function typeChar(){
+      if(i < activeCaption.length){
+        captionsDiv.innerHTML += activeCaption.charAt(i);
+        i++;
+        typingTimeout = setTimeout(typeChar, 40); // typing speed (ms)
+      }
+    }
+    typeChar();
+  }
+});
 </script>
 
 </body>
