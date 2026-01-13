@@ -1,7 +1,133 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta charset=<!DOCTYPE html>
+<html lang="en">
+<head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L Voice Player - Word by Word Captions</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+    color: #fff;
+    font-family:'Inter',sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    height:100vh;
+    overflow:hidden;
+    padding:20px;
+  }
+  h1 {
+    font-size:2.5rem;
+    margin-bottom:20px;
+    text-align:center;
+    letter-spacing:2px;
+    text-shadow:0 0 10px rgba(0,0,0,0.5);
+  }
+  audio {
+    width:100%;
+    max-width:600px;
+    border-radius:12px;
+    margin-bottom:30px;
+    outline:none;
+    box-shadow:0 8px 20px rgba(0,0,0,0.4);
+  }
+  .captions {
+    background: rgba(0,0,0,0.5);
+    padding:15px 20px;
+    border-radius:12px;
+    max-width:700px;
+    font-size:1.25rem;
+    min-height:60px;
+    line-height:1.5;
+    text-align:center;
+    box-shadow:0 4px 15px rgba(0,0,0,0.4);
+  }
+  .captions span {
+    opacity:0.3;
+    transition: opacity 0.2s ease;
+  }
+  .captions span.active {
+    opacity:1;
+    color:#ffd700;
+  }
+  @media(max-width:768px){
+    h1 { font-size:2rem; }
+    .captions { font-size:1rem; padding:10px 15px; }
+  }
+</style>
+</head>
+<body>
+
+<h1>L Voice Player</h1>
+
+<audio id="audio" controls>
+  <source src="l-voice.mp3" type="audio/mpeg">
+  Your browser does not support the audio element.
+</audio>
+
+<div class="captions" id="captions">Captions will appear here...</div>
+
+<script>
+const audio = document.getElementById('audio');
+const captionsDiv = document.getElementById('captions');
+
+let captions = [];
+
+// Load VTT file
+fetch('l-voice.vtt')
+  .then(res => res.text())
+  .then(data => {
+    const lines = data.split(/\r?\n/);
+    for(let i=0;i<lines.length;i++){
+      if(lines[i].includes('-->')){
+        const times = lines[i].split(' --> ');
+        const start = parseTime(times[0].trim());
+        const end = parseTime(times[1].trim());
+        const text = lines[i+1] || '';
+        // Split line into words and assign timing
+        const words = text.split(' ').map((word,index)=>{
+          // Simple proportional distribution of time per word
+          const duration = (end-start)/text.split(' ').length;
+          return {text:word, start: start + index*duration, end: start + (index+1)*duration};
+        });
+        captions.push(...words);
+        i++;
+      }
+    }
+  });
+
+function parseTime(timeString){
+  const parts = timeString.split(':');
+  let seconds = 0;
+  if(parts.length===3){
+    seconds = parseFloat(parts[0])*3600 + parseFloat(parts[1])*60 + parseFloat(parts[2].replace(',', '.'));
+  } else if(parts.length===2){
+    seconds = parseFloat(parts[0])*60 + parseFloat(parts[1].replace(',', '.'));
+  }
+  return seconds;
+}
+
+// Word-by-word display
+audio.addEventListener('timeupdate', ()=>{
+  const currentTime = audio.currentTime;
+  let html = captions.map(c=>{
+    return `<span class="${(currentTime>=c.start && currentTime<=c.end)?'active':''}">${c.text}</span>`;
+  }).join(' ');
+  captionsDiv.innerHTML = html;
+});
+</script>
+
+</body>
+</html>
+"UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>L Voice Player</title>
 
@@ -142,3 +268,4 @@
 
 </body>
 </html>
+
