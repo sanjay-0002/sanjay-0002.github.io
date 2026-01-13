@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>L Voice Player - Typing Captions</title>
+<title>L</title>
 
 <style>
 @font-face {
@@ -13,145 +13,413 @@
   font-style: normal;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+body {
   font-family: 'CustomText', sans-serif;
+  /* other styles */
+}
+
+
+
+
+
+
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
-  background: linear-gradient(135deg,#0f2027,#203a43,#2c5364);
-  color: #fff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
-  padding: 20px;
+    background: #0d1117;
+    color: #c9d1d9;
+    height: 100vh;
+    overflow: hidden;
 }
 
-h1 {
-  font-size: 2.5rem;
-  margin-bottom: 20px;
-  text-align: center;
-  letter-spacing: 2px;
-  text-shadow: 0 0 10px rgba(0,0,0,0.5);
+/* Overlay (user gesture gate) */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: #0d1117;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    animation: fadeIn 0.6s ease;
 }
 
-audio {
-  width: 100%;
-  max-width: 600px;
-  border-radius: 12px;
-  margin-bottom: 30px;
-  outline: none;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+.overlay-text {
+    letter-spacing: 6px;
+    font-size: 18px;
+    opacity: 0.6;
+    animation: blink 1.4s infinite;
 }
 
-.captions {
-  background: rgba(0,0,0,0.5);
-  padding: 15px 20px;
-  border-radius: 12px;
-  max-width: 700px;
-  text-align: center;
-  font-size: 1.25rem;
-  min-height: 60px;
-  line-height: 1.5;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-  overflow-wrap: break-word;
+/* Logo */
+.logo-container {
+    
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    animation: logoFade 2s ease forwards;
 }
 
-/* Typing cursor effect */
-.captions::after {
-  content: '|';
-  animation: blink 1s infinite;
-  margin-left: 2px;
+.logo {
+    width: 140px;
+    filter: drop-shadow(0 0 25px rgba(255,255,255,0.25));
+    animation: glow 3s ease-in-out infinite alternate;
+}
+
+/* Glitch layers */
+.glitch {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    mix-blend-mode: screen;
+}
+
+.gl1 { background: rgba(255,0,0,0.07); }
+.gl2 { background: rgba(0,255,255,0.06); }
+.gl3 { background: rgba(255,255,255,0.04); }
+
+.scanlines {
+    position: fixed;
+    inset: 0;
+    background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0) 50%,
+        rgba(0,0,0,0.15) 50%
+    );
+    background-size: 100% 4px;
+    opacity: 0.25;
+    pointer-events: none;
+}
+
+/* Status */
+.status {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    font-size: 13px;
+    opacity: 0.7;
+}
+
+.dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #238636;
+    border-radius: 50%;
+    margin-right: 6px;
+    animation: pulse 2s infinite;
+}
+
+/* Animations */
+@keyframes logoFade {
+    to { opacity: 1; }
+}
+
+@keyframes glow {
+    to { filter: drop-shadow(0 0 40px rgba(255,255,255,0.4)); }
 }
 
 @keyframes blink {
-  0%, 50%, 100% { opacity: 1; }
-  25%, 75% { opacity: 0; }
+    50% { opacity: 1; }
 }
 
-@media(max-width:768px){
-  h1 { font-size:2rem; }
-  .captions { font-size:1rem; padding:10px 15px; }
+@keyframes pulse {
+    50% { opacity: 0.4; }
 }
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  /* Reset & base styles */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #fff;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 130vh;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    text-align: center;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(0,0,0,0.5);
+  }
+
+  audio {
+    width: 100%;
+    max-width: 600px;
+    outline: none;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+  }
+
+  .captions {
+    background: rgba(0,0,0,0.5);
+    padding: 15px 20px;
+    border-radius: 12px;
+    max-width: 700px;
+    text-align: center;
+    font-size: 1.25rem;
+    min-height: 60px;
+    line-height: 1.5;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    transition: all 0.3s ease;
+  }
+
+  .captions span {
+    display: block;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .captions span.active {
+    opacity: 1;
+    color: #ffd700;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    h1 {
+      font-size: 2rem;
+    }
+    .captions {
+      font-size: 1rem;
+      padding: 10px 15px;
+    }
+  }
+
 </style>
 </head>
+
 <body>
 
-<h1>L Voice Player</h1>
+<!-- USER GESTURE OVERLAY -->
+<div class="overlay" id="overlay">
+    <div class="overlay-text">ENTER</div>
+</div>
 
-<audio id="audio" controls>
-  <source src="l-voice.mp3" type="audio/mpeg">
-  Your browser does not support the audio element.
-</audio>
+<!-- EFFECTS -->
+<div class="glitch gl1"></div>
+<div class="glitch gl2"></div>
+<div class="glitch gl3"></div>
+<div class="scanlines"></div>
+
+<!-- LOGO -->
+<div class="logo-container" id="logoBox">
+    <img src="l-t.png" class="logo" alt="L">
+</div>
 
 <div class="captions" id="captions">Captions will appear here...</div>
 
+
+<!-- STATUS -->
+<div class="status">
+     AUDIO VISUALISER
+</div>
+
+<!-- AUDIO -->
+<audio id="glitchAudio" loop>
+    <source src="glitch-bgm.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="voiceAudio">
+    <source src="l-voice.mp3" type="audio/mpeg">
+</audio>
+
 <script>
-const audio = document.getElementById('audio');
-const captionsDiv = document.getElementById('captions');
+const overlay = document.getElementById('overlay');
+const glitchAudio = document.getElementById('glitchAudio');
+const voiceAudio = document.getElementById('voiceAudio');
+const logoBox = document.getElementById('logoBox');
 
-let captions = [];
+glitchAudio.volume = 0.15;
+voiceAudio.volume = 0.85;
 
-// Load VTT file
-fetch('l-voice.vtt')
-  .then(res => res.text())
-  .then(data => {
-    const lines = data.split(/\r?\n/);
-    for(let i=0;i<lines.length;i++){
-      if(lines[i].includes('-->')){
-        const times = lines[i].split(' --> ');
-        const start = parseTime(times[0].trim());
-        const end = parseTime(times[1].trim());
-        const text = lines[i+1] || '';
-        captions.push({start, end, text});
-        i++;
-      }
+overlay.addEventListener('click', () => {
+    // Fullscreen (allowed because of user click)
+    if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen();
     }
-  });
 
-function parseTime(timeString){
-  const parts = timeString.split(':');
-  let seconds = 0;
-  if(parts.length===3){
-    seconds = parseFloat(parts[0])*3600 + parseFloat(parts[1])*60 + parseFloat(parts[2].replace(',', '.'));
-  } else if(parts.length===2){
-    seconds = parseFloat(parts[0])*60 + parseFloat(parts[1].replace(',', '.'));
-  }
-  return seconds;
-}
+    // Start audio instantly
+    glitchAudio.play();
+    voiceAudio.play();
 
-let typingTimeout;
-
-audio.addEventListener('timeupdate', ()=>{
-  const currentTime = audio.currentTime;
-  let activeCaption = '';
-  captions.forEach(c=>{
-    if(currentTime >= c.start && currentTime <= c.end){
-      activeCaption = c.text;
-    }
-  });
-
-  // If caption changed, animate typing
-  if(captionsDiv.dataset.current !== activeCaption){
-    captionsDiv.dataset.current = activeCaption;
-    captionsDiv.innerHTML = '';
-    let i = 0;
-    clearTimeout(typingTimeout);
-    function typeChar(){
-      if(i < activeCaption.length){
-        captionsDiv.innerHTML += activeCaption.charAt(i);
-        i++;
-        typingTimeout = setTimeout(typeChar, 40); // typing speed (ms)
-      }
-    }
-    typeChar();
-  }
+    // Reveal visuals
+    logoBox.style.animationDelay = '0.3s';
+    overlay.style.display = 'none';
 });
+
+/* Subtle glitch motion */
+setInterval(() => {
+    document.querySelectorAll('.glitch').forEach(layer => {
+        layer.style.opacity = Math.random() * 0.12;
+        layer.style.transform =
+            `translate(${Math.random()*4-2}px,${Math.random()*4-2}px)`;
+    });
+}, 120);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  const audio = document.getElementById('audio');
+  const captionsDiv = document.getElementById('captions');
+
+  // Load captions from VTT
+  let captions = [];
+
+  fetch('https://github.com/sanjay-0002/sanjay-0002.github.io/blob/main/l-voice.vtt')
+    .then(response => response.text())
+    .then(data => {
+      // Parse VTT file
+      const lines = data.split(/\r?\n/);
+      for (let i = 0; i < lines.length; i++) {
+        if (lines[i].includes('-->')) {
+          const times = lines[i].split(' --> ');
+          const start = parseTime(times[0].trim());
+          const end = parseTime(times[1].trim());
+          const text = lines[i+1] || '';
+          captions.push({start, end, text});
+          i++; // skip text line
+        }
+      }
+    });
+
+  function parseTime(timeString) {
+    const parts = timeString.split(':');
+    let seconds = 0;
+    if (parts.length === 3) {
+      seconds = parseFloat(parts[0])*3600 + parseFloat(parts[1])*60 + parseFloat(parts[2].replace(',', '.'));
+    } else if (parts.length === 2) {
+      seconds = parseFloat(parts[0])*60 + parseFloat(parts[1].replace(',', '.'));
+    }
+    return seconds;
+  }
+
+  // Update captions as audio plays
+  audio.addEventListener('timeupdate', () => {
+    const currentTime = audio.currentTime;
+    let activeText = '';
+    captions.forEach(c => {
+      if (currentTime >= c.start && currentTime <= c.end) {
+        activeText = c.text;
+      }
+    });
+    captionsDiv.innerHTML = activeText ? `<span class="active">${activeText}</span>` : '';
+  });
 </script>
 
 </body>
